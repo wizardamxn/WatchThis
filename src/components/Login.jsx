@@ -1,18 +1,52 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/fireBase";
 import Header from "./Header";
 import { checkValidate } from "../utils/validate";
+import { signInWithEmailAndPassword } from "firebase/auth";
 const Login = () => {
   const [isSiginIn, setIsSignIn] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(null)
-  const handleEmail = () => {
-    setIsEmailCorrect(!is)
-  }
+  const [errorMessage, setErrorMessage] = useState(null);
   const handleSignIn = () => {
     setIsSignIn(!isSiginIn);
   };
   const handleButtonClick = () => {
-    const Message = checkValidate(email.current.value, password.current.value)
-    setErrorMessage(Message)
+    const Message = checkValidate(email.current.value, password.current.value);
+    setErrorMessage(Message);
+    if (Message) return;
+    if (!isSiginIn) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + "-" + errorMessage);
+        });
+    } else {
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrorMessage(errorCode + " " + errorMessage);
+        });
+    }
   };
 
   const email = useRef(null);
@@ -39,7 +73,6 @@ const Login = () => {
               className="p-2 m-4 text-white border-2 rounded-sm border-gray-200 w-[70%] h-[50px] "
             ></input>
           )}
-           
 
           <input
             ref={email}
@@ -53,11 +86,12 @@ const Login = () => {
             placeholder="Password"
             className="p-2 m-4 text-white border-2 rounded-sm border-gray-200 w-[70%] h-[50px]"
           ></input>
-          <p className="text-[rgb(229,9,20)] font-medium text-md">{errorMessage}</p>
+          <p className="text-[rgb(229,9,20)] font-medium text-md">
+            {errorMessage}
+          </p>
           <button
             onClick={handleButtonClick}
-            className="flex p-1 m-2 justify-center rounded-sm w-[70%] font-bold text-white text-xl bg-[rgb(229,9,20)]
- "
+            className="flex p-1 m-2 justify-center rounded-sm w-[70%] font-bold text-white text-xl bg-[rgb(229,9,20)]"
           >
             {isSiginIn ? "Sign In" : "Sign Up"}
           </button>
