@@ -4,12 +4,23 @@ import { auth } from "../utils/fireBase";
 import Header from "./Header";
 import { checkValidate } from "../utils/validate";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/useSlice";
+
 const Login = () => {
+  const dispatch = useDispatch();
   const [isSiginIn, setIsSignIn] = useState(true);
+  const [isPassword, setIsPassword] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null);
+  const navigate = useNavigate();
   const handleSignIn = () => {
     setIsSignIn(!isSiginIn);
   };
+  const handlePasswordVis = () => {
+    setIsPassword(!isPassword)
+  }
   const handleButtonClick = () => {
     const Message = checkValidate(email.current.value, password.current.value);
     setErrorMessage(Message);
@@ -21,8 +32,29 @@ const Login = () => {
         password.current.value
       )
         .then((userCredential) => {
-          // Signed up
           const user = userCredential.user;
+
+          updateProfile(user, {
+            displayName: name.current.value,
+            photoURL: "https://picsum.photos/200/300",
+          })
+            .then(() => {
+              const { uid, email, displayName, photoURL } = auth.currentUser;
+              dispatch(
+                addUser({
+                  uid: uid,
+                  email: email,
+                  displayName: displayName,
+                  photoURL: photoURL,
+                })
+              );
+            })
+            .then(() => {
+              navigate("/browse");
+            })
+            .catch((error) => {
+              navigate("/error")
+            });
           console.log(user);
         })
         .catch((error) => {
@@ -37,7 +69,6 @@ const Login = () => {
         password.current.value
       )
         .then((userCredential) => {
-          // Signed in
           const user = userCredential.user;
           console.log(user);
         })
@@ -49,6 +80,7 @@ const Login = () => {
     }
   };
 
+  const name = useRef(null);
   const email = useRef(null);
   const password = useRef(null);
 
@@ -68,9 +100,10 @@ const Login = () => {
         >
           {!isSiginIn && (
             <input
+              ref={name}
               type="text"
               placeholder="Full Name"
-              className="p-2 m-4 text-white border-2 rounded-sm border-gray-200 w-[70%] h-[50px] "
+              className="p-2 px-4 m-4 text-white border border-gray-600 rounded-sm  w-[70%] h-[50px] "
             ></input>
           )}
 
@@ -78,14 +111,22 @@ const Login = () => {
             ref={email}
             type="text"
             placeholder="Email Address"
-            className="p-2 m-4 text-white border-2 rounded-sm border-gray-200 w-[70%] h-[50px] "
+            className="p-2 px-4 m-4 text-white border rounded-sm border-gray-600 w-[70%] h-[50px] "
           ></input>
-          <input
-            ref={password}
-            type="text"
-            placeholder="Password"
-            className="p-2 m-4 text-white border-2 rounded-sm border-gray-200 w-[70%] h-[50px]"
-          ></input>
+          <div className="relative border m-4 border-gray-600 rounded-sm w-[70%] h-[50px] flex justify-center items-center ">
+      <input
+        ref={password}
+        type={isPassword ? "password" : "text"}
+        placeholder="Password"
+        className="w-full h-full bg-transparent text-white placeholder-gray-400 px-4 pr-10 focus:outline-none"
+      />
+      <p
+        className="text-gray-400 hover:text-white absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg"
+        onClick={handlePasswordVis}
+      >
+        {isPassword ? "👁️" : "🙈"}
+      </p>
+    </div>
           <p className="text-[rgb(229,9,20)] font-medium text-md">
             {errorMessage}
           </p>
