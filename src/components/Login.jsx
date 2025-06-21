@@ -8,6 +8,7 @@ import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/useSlice";
+import { BG_LOGO } from "../constants/URL";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -85,7 +86,10 @@ const Login = () => {
   const password = useRef(null);
 
   return (
-    <div className=' bg-[url("https://assets.nflxext.com/ffe/siteui/vlv3/6863f6e8-d419-414d-b5b9-7ef657e67ce4/web/IN-en-20250602-TRIFECTA-perspective_27a3fdfa-126f-4148-b153-55d60b51be6a_large.jpg")] w-screen h-screen flex justify-center items-center'>
+    <div
+  className="w-screen h-screen flex justify-center items-center bg-cover bg-center"
+  style={{ backgroundImage: `url(${BG_LOGO})` }}
+>
       <Header />
       <div
         className="flex  w-[450px] h-[600px] bg-black/83  flex-col box-border
