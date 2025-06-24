@@ -5,12 +5,14 @@ import useTrailer from "../hooks/useTrailer";
 import { setPageAndMovieNum } from "../utils/MovieSlice";
 import useRandom from "../hooks/useRandom";
 import { use, useEffect } from "react";
+import { HorizontalScrollContainer } from "../functions/HorizontalScrollContainer";
 
 // Landing component
 export const Landing = () => {
   return (
     <div className="h-full w-full aspect-[21/9]">
       <Primary />
+      <Secondary/>
     </div>
   );
 };
@@ -20,7 +22,7 @@ export const Primary = () => {
   const trailerVideo = useSelector((store) => store.movies.trailer);
   const trailerTitle = useSelector((store) => store.movies.trailer);
   const trailerOverview = useSelector((store) => store.movies.overview)
-  console.log(trailerTitle);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -68,17 +70,19 @@ export const Primary = () => {
   // or return something if needed
 };
 
-// Secondary component
 export const Secondary = () => {
   const movies = useSelector((store) => store.movies?.nowPlayingMovies);
 
   if (!movies) return <div>Loading movies...</div>;
 
   return (
-    <div className="flex flex-wrap">
-      {movies.map((movie) => (
-        <MovieCard key={movie.id} coverImage={movie.poster_path} />
-      ))}
+    <div className="bg-black pt-0 pb-4 px-4 -mt-2 ">
+      <h2 className="text-white text-2xl font-bold mb-4 z-50">Now Playing</h2>
+      <HorizontalScrollContainer>
+        {movies.map((movie) => (
+          <MovieCard key={movie.id} coverImage={movie.poster_path} />
+        ))}
+      </HorizontalScrollContainer>
     </div>
   );
 };
