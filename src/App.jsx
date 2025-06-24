@@ -6,6 +6,7 @@ import Browse from "./components/Browse";
 import AppLayout from "./components/AppLayout.jsx";
 import Error from "./components/Error.jsx";
 
+
 const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -24,6 +25,7 @@ function App() {
     <Provider store={appStore}>
       <RouterProvider router={appRouter} />
     </Provider>
+
   );
 }
 

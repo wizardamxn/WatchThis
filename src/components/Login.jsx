@@ -7,7 +7,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { updateProfile } from "firebase/auth";
 import { useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
-import { addUser } from "../utils/useSlice";
+import { addUser } from "../utils/userSlice";
 import { BG_LOGO } from "../constants/URL";
 
 const Login = () => {

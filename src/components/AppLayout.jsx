@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../utils/fireBase";
-import { addUser, removeUser } from "../utils/useSlice";
+import { addUser, removeUser } from "../utils/userSlice";
 
 const AppLayout = () => {
   const dispatch = useDispatch();
