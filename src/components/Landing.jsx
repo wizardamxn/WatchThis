@@ -78,15 +78,25 @@ export const Primary = () => {
 
 // Secondary (Movie Cards) Component
 export const Secondary = ({ Heading, movies }) => {
-  if (!movies) return <div className="text-white">Loading movies...</div>;
+  if (!movies) return <div className="text-white px-6 py-4">Loading...</div>;
 
   return (
-    <div className="w-full">
-      <h2 className="text-white text-2xl ml-6 font-bold mb-4 z-50">{Heading}</h2>
+    <div className="w-full mb-10">
+      {/* Section Title */}
+      <h2 className="text-white text-2xl font-semibold px-6 mb-4">{Heading}</h2>
+
+      {/* Horizontal Scrollable Container */}
       <HorizontalScrollContainer>
+        <div className="flex space-x-4 px-6 scrollbar-hide overflow-y-clip">
         {movies.map((movie) => (
-          <MovieCard key={movie.id} coverImage={movie.poster_path} />
+          <MovieCard
+            key={movie.id}
+            movieTitle={movie.title}
+            coverImage={movie.poster_path}
+            rating={movie.vote_average}
+          />
         ))}
+      </div>
       </HorizontalScrollContainer>
     </div>
   );
