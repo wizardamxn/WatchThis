@@ -15,7 +15,7 @@ const ScrollButtons = ({ scrollRef }) => {
     <>
       <button
         onClick={() => scroll("left")}
-        className="absolute h-full w-[60px] left-0 top-1/2 -translate-y-1/2 z-10  text-white px-2 py-1 rounded-md hover:bg-black/60"
+        className="absolute h-full w-[60px] left-0 top-1/2 -translate-y-1/2 z-50  text-white px-2 py-1 rounded-md hover:bg-black/60"
         onMouseEnter={() => setClick(true)}
         onMouseLeave={() =>  setClick(false)}
       >
@@ -24,7 +24,7 @@ const ScrollButtons = ({ scrollRef }) => {
 
       <button
         onClick={() => scroll("right")}
-        className="absolute h-full w-[60px] right-0 top-1/2 -translate-y-1/2 z-10  text-white px-2 py-1 rounded-lg hover:bg-black/60"
+        className="absolute h-full w-[60px] right-0 top-1/2 -translate-y-1/2 z-50  text-white px-2 py-1 rounded-lg hover:bg-black/60"
         onMouseEnter={() => setClick(true)}
         onMouseLeave={() => setClick(false)}
       >

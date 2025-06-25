@@ -29,11 +29,11 @@ const Browse = () => {
 
   return (
     <div className="w-full h-full ">
-      <div className="flex justify-between fixed z-40 w-full">
+      <div className="flex justify-between fixed z-50 w-full">
         <div className="">
           <Header />
         </div>
-        <div className="z-40 flex justify-center items-center cursor-pointer">
+        <div className="z-50 flex justify-center items-center cursor-pointer">
           <img
             src={userImage?.photoURL || "/default-avatar.png"}
             className="w-16 h-16 m-6 ml-10"
