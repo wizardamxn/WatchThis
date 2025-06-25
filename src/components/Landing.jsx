@@ -1,83 +1,88 @@
 import { useDispatch, useSelector } from "react-redux";
-
 import MovieCard from "./MovieCard";
 import useTrailer from "../hooks/useTrailer";
 import { setPageAndMovieNum } from "../utils/MovieSlice";
-import useRandom from "../hooks/useRandom";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
 import { HorizontalScrollContainer } from "../functions/HorizontalScrollContainer";
+import { usePopularMovies } from "../hooks/usePopularMovies";
+import { useNowPlayingMovies } from "../hooks/useNowPlayingMovies";
 
 // Landing component
 export const Landing = () => {
+
+  const movies = useSelector((store) => store.movies);
+
   return (
-    <div className="h-full w-full aspect-[21/9]">
+    <div className="relative w-full h-full bg-black">
       <Primary />
-      <Secondary/>
+
+      {/* Fade gradient from black to transparent */}
+      <div className="absolute bottom-0 w-full h-48 bg-gradient-to-t from-black to-transparent z-30" />
+
+      {/* First row overlaps trailer */}
+      <div className="relative z-40 px-4 ml-10 -mt-16">
+        <Secondary Heading={"Now Playing"} movies={movies?.nowPlayingMovies} />
+      </div>
+
+      {/* Other rows */}
+      <div className="relative z-40 p-4 ml-10 space-y-6">
+        <Secondary Heading={"Top Rated"} movies={movies?.topRatedMovies} />
+        <Secondary Heading={"Popular"} movies={movies?.popularMovies} />
+        <Secondary Heading={"Upcoming"} movies={movies?.upcomingMovies} />
+        {/* <Secondary Heading={"Romance"} movies={movies?.nowPlayingMovies} /> */}
+      </div>
     </div>
   );
 };
 
-// Primary component
+// Primary (Trailer) Component
 export const Primary = () => {
   const trailerVideo = useSelector((store) => store.movies.trailer);
-  const trailerTitle = useSelector((store) => store.movies.trailer);
-  const trailerOverview = useSelector((store) => store.movies.overview)
+  const title = useSelector((store) => store.movies.title);
+  const trailerOverview = useSelector((store) => store.movies.overview);
 
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const randomPage = Math.floor(Math.random() * 20) + 1; // Pages 1–20
-    const randomMovieIndex = Math.floor(Math.random() * 20); // Index 0–19
-
-    dispatch(
-      setPageAndMovieNum({
-        pageNum: randomPage,
-        movieNum: randomMovieIndex,
-      })
-    );
+    const randomPage = Math.floor(Math.random() * 20) + 1;
+    const randomMovieIndex = Math.floor(Math.random() * 20);
+    dispatch(setPageAndMovieNum({ pageNum: randomPage, movieNum: randomMovieIndex }));
   }, []);
 
-  const title = useSelector((store) => store.movies.title);
   useTrailer();
+
   return (
-    <div className="relative w-full h-full">
- <iframe
-    className="absolute top-0 left-0 w-full h-full object-cover"
-    src={`https://www.youtube.com/embed/${trailerVideo?.key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerVideo?.key}&rel=0&modestbranding=1&vq=hd1080`}
-    title="YouTube video player"
-    allow="autoplay; encrypted-media"
-    allowFullScreen
-    referrerPolicy="strict-origin-when-cross-origin"
-  ></iframe>
+    <div className="relative w-full aspect-[21/9] z-10">
+      <iframe
+        className="absolute top-0 left-0 w-full h-full"
+        src={`https://www.youtube.com/embed/${trailerVideo?.key}?autoplay=1&mute=1&controls=0&loop=1&playlist=${trailerVideo?.key}&rel=0&modestbranding=1&vq=hd1080`}
+        title="YouTube trailer"
+        allow="autoplay; encrypted-media"
+        allowFullScreen
+        referrerPolicy="strict-origin-when-cross-origin"
+      ></iframe>
 
+      {/* Gradient for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-20" />
 
-  {/* Optional: dark gradient for readability */}
-  <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-[5]" />
-
-  {/* Text Container */}
-  <div className="absolute top-[30%] left-12 z-10 text-white w-[80%] max-w-4xl">
-    <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl xl:text-8xl mb-4 leading-tight">
-      {title}
-    </h1>
-    <p className="font-medium text-md md:text-lg lg:text-xl xl:text-2xl leading-snug">
-      {trailerOverview}
-    </p>
-  </div>
-</div>
-
+      {/* Text content */}
+      <div className="absolute top-[30%] left-12 z-30 text-white max-w-5xl">
+        <h1 className="font-bold text-4xl md:text-6xl lg:text-7xl xl:text-8xl mb-4">
+          {title}
+        </h1>
+        <p className="text-lg md:text-xl">{trailerOverview}</p>
+      </div>
+    </div>
   );
-
-  // or return something if needed
 };
 
-export const Secondary = () => {
-  const movies = useSelector((store) => store.movies?.nowPlayingMovies);
-
-  if (!movies) return <div>Loading movies...</div>;
+// Secondary (Movie Cards) Component
+export const Secondary = ({ Heading, movies }) => {
+  if (!movies) return <div className="text-white">Loading movies...</div>;
 
   return (
-    <div className="bg-black pt-0 pb-4 px-4 -mt-2 ">
-      <h2 className="text-white text-2xl font-bold mb-4 z-50">Now Playing</h2>
+    <div className="w-full">
+      <h2 className="text-white text-2xl ml-6 font-bold mb-4 z-50">{Heading}</h2>
       <HorizontalScrollContainer>
         {movies.map((movie) => (
           <MovieCard key={movie.id} coverImage={movie.poster_path} />

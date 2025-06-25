@@ -5,11 +5,17 @@ import { useNavigate } from "react-router";
 import { useSelector } from "react-redux";
 import { useNowPlayingMovies } from "../hooks/useNowPlayingMovies";
 import { Landing } from "./Landing";
+import { usePopularMovies } from "../hooks/usePopularMovies";
+import { useTopRatedMovies } from "../hooks/useTopRatedMovies";
+import { useUpcomingMovies } from "../hooks/useUpcomingMovies";
 
 const Browse = () => {
   const userImage = useSelector((store) => store.user);
   const navigate = useNavigate();
   useNowPlayingMovies();
+  usePopularMovies();
+  useTopRatedMovies();
+  useUpcomingMovies()
 
   const handleSignOut = () => {
     signOut(auth)

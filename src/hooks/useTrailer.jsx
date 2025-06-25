@@ -13,10 +13,11 @@ const useTrailer = () => {
   const id = movies?.[movieNum]?.id;
   const title = movies?.[movieNum]?.original_title
   const overView = movies?.[movieNum]?.overview
-  dispatch(addOverview(overView))
-  dispatch(addTitle(title))
+
 //   const [trailer, setTrailer] = useState();
   useEffect(() => {
+      dispatch(addOverview(overView))
+  dispatch(addTitle(title))
     let json = null;
     const getMovieVideo = async () => {
       if (!id) return; // wait until id is ready
@@ -26,6 +27,7 @@ const useTrailer = () => {
           options
         );
         json = await data.json();
+        if(!json) return;
       } catch (err) {
         console.error("Error fetching movie video:", err);
       }
