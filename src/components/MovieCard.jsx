@@ -3,8 +3,9 @@ import React, { useState } from "react";
 const MovieCard = ({ movieTitle, rating, coverImage }) => {
   const [isLoading, setIsLoading] = useState(true);
   const imageUrl = `https://image.tmdb.org/t/p/w500${coverImage}`;
-
+  if(!coverImage) return null;
   return (
+    
     <div className="relative flex-shrink-0 w-[220px] h-[330px] rounded-md overflow-hidden transform transition-transform duration-300 hover:scale-110 hover:z-20 group cursor-pointer">
       
       {/* Shimmer Loading Overlay */}

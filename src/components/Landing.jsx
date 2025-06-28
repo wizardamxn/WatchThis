@@ -11,6 +11,7 @@ import { useNowPlayingMovies } from "../hooks/useNowPlayingMovies";
 export const Landing = () => {
 
   const movies = useSelector((store) => store.movies);
+  console.log(movies?.popularMovies)
 
   return (
     <div className="relative w-full h-full bg-black">
@@ -62,7 +63,6 @@ export const Primary = () => {
         referrerPolicy="strict-origin-when-cross-origin"
       ></iframe>
 
-      {/* Gradient for text readability */}
       <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-20" />
 
       {/* Text content */}

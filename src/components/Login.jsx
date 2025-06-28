@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../utils/fireBase";
-import Header from "./Header";
+import LoginHeader from "./LoginHeader";
 import { checkValidate } from "../utils/validate";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { updateProfile } from "firebase/auth";
@@ -90,7 +90,7 @@ const Login = () => {
   className="w-screen h-screen flex justify-center items-center bg-cover bg-center"
   style={{ backgroundImage: `url(${BG_LOGO})` }}
 >
-      <Header />
+      <LoginHeader />
       <div
         className="flex  w-[450px] h-[600px] bg-black/83  flex-col box-border
 "
