@@ -79,7 +79,7 @@ const BrowseHeader = () => {
   return (
     <div className="fixed flex justify-between items-center top-0 w-full h-20 px-8 bg-gradient-to-b from-black z-50">
       {/* Netflix Logo */}
-      <img src={NETFLIX_LOGO_URL} alt="Netflix Logo" className="h-14" />
+      <img src={NETFLIX_LOGO_URL} alt="Netflix Logo" className="w-22" />
 
       {/* Search Bar */}
       <div className="relative mt-4 mr-6 flex items-center gap-2">
@@ -92,7 +92,7 @@ const BrowseHeader = () => {
           onClick={handleClickSearch}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-5 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 active:scale-95 transition-all duration-200 shadow-lg shadow-black/30"
+         className="w-full flex justify-center items-center gap-2 h-12 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-xl"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

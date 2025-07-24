@@ -13,19 +13,27 @@ import { BG_LOGO } from "../constants/URL";
 const Login = () => {
   const dispatch = useDispatch();
   const [isSiginIn, setIsSignIn] = useState(true);
-  const [isPassword, setIsPassword] = useState(true)
+  const [isPassword, setIsPassword] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  
   const handleSignIn = () => {
     setIsSignIn(!isSiginIn);
+    setErrorMessage(null);
   };
+  
   const handlePasswordVis = () => {
-    setIsPassword(!isPassword)
-  }
-  const handleButtonClick = () => {
+    setIsPassword(!isPassword);
+  };
+  
+  const handleButtonClick = async () => {
     const Message = checkValidate(email.current.value, password.current.value);
     setErrorMessage(Message);
     if (Message) return;
+    
+    setIsLoading(true);
+    
     if (!isSiginIn) {
       createUserWithEmailAndPassword(
         auth,
@@ -54,7 +62,7 @@ const Login = () => {
               navigate("/browse");
             })
             .catch((error) => {
-              navigate("/error")
+              navigate("/error");
             });
           console.log(user);
         })
@@ -62,6 +70,9 @@ const Login = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrorMessage(errorCode + "-" + errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     } else {
       signInWithEmailAndPassword(
@@ -77,6 +88,9 @@ const Login = () => {
           const errorCode = error.code;
           const errorMessage = error.message;
           setErrorMessage(errorCode + " " + errorMessage);
+        })
+        .finally(() => {
+          setIsLoading(false);
         });
     }
   };
@@ -87,83 +101,140 @@ const Login = () => {
 
   return (
     <div
-  className="w-screen h-screen flex justify-center items-center bg-cover bg-center"
-  style={{ backgroundImage: `url(${BG_LOGO})` }}
->
+      className="w-screen h-screen flex justify-center items-center bg-cover bg-center relative"
+      style={{ backgroundImage: `url(${BG_LOGO})` }}
+    >
+      {/* Dark overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/40"></div>
+      
       <LoginHeader />
-      <div
-        className="flex  w-[450px] h-[600px] bg-black/83  flex-col box-border
-"
-      >
-        <h1 className="text-white text-3xl font-semibold mt-10 ml-10 mr-10 mb-5 relative left-[7%]">
-          {isSiginIn ? "Sign In" : "Sign Up"}
-        </h1>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="w-full h-full flex items-center flex-col"
-        >
+      
+      <div className="relative z-10 flex rounded-2xl w-[420px] min-h-[600px] bg-black/90 backdrop-blur-md flex-col shadow-2xl border border-gray-800/50">
+        {/* Header */}
+        <div className="px-8 pt-8 pb-6">
+          <h1 className="text-white text-3xl font-bold tracking-wide">
+            {isSiginIn ? "Welcome Back" : "Join Us"}
+          </h1>
+          <p className="text-gray-400 text-sm mt-2">
+            {isSiginIn ? "Sign in to your account" : "Create your account"}
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className="flex flex-col px-8 pb-8 space-y-6">
+          {/* Name Input (Sign Up only) */}
           {!isSiginIn && (
-            <input
-              ref={name}
-              type="text"
-              placeholder="Full Name"
-              className="p-2 px-4 m-4 text-white border border-gray-600 rounded-sm  w-[70%] h-[50px] "
-            ></input>
+            <div className="relative">
+              <input
+                ref={name}
+                type="text"
+                placeholder="Full Name"
+                className="w-full h-12 px-4 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 hover:border-gray-600"
+              />
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                <svg className="h-5 w-5 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+              </div>
+            </div>
           )}
 
-          <input
-            ref={email}
-            type="text"
-            placeholder="Email Address"
-            className="p-2 px-4 m-4 text-white border rounded-sm border-gray-600 w-[70%] h-[50px] "
-          ></input>
-          <div className="relative border m-4 border-gray-600 rounded-sm w-[70%] h-[50px] flex justify-center items-center ">
-      <input
-        ref={password}
-        type={isPassword ? "password" : "text"}
-        placeholder="Password"
-        className="w-full h-full bg-transparent text-white placeholder-gray-400 px-4 pr-10 focus:outline-none"
-      />
-      <p
-        className="text-gray-400 hover:text-white absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-lg"
-        onClick={handlePasswordVis}
-      >
-        {isPassword ? "👁️" : "🙈"}
-      </p>
-    </div>
-          <p className="text-[rgb(229,9,20)] font-medium text-md">
-            {errorMessage}
-          </p>
+          {/* Email Input */}
+          <div className="relative">
+            <input
+              ref={email}
+              type="text"
+              placeholder="Email Address"
+              className="w-full h-12 px-4 pr-12 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 hover:border-gray-600"
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <svg className="h-5 w-5 text-gray-400" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+          </div>
+
+          {/* Password Input */}
+          <div className="relative">
+            <input
+              ref={password}
+              type={isPassword ? "password" : "text"}
+              placeholder="Password"
+              className="w-full h-12 px-4 pr-12 bg-gray-900/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all duration-200 hover:border-gray-600"
+            />
+            <button
+              type="button"
+              onClick={handlePasswordVis}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-cyan-400 transition-colors duration-200"
+            >
+              {isPassword ? (
+                <svg className="h-5 w-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                  <path d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              )}
+            </button>
+          </div>
+
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+              <p className="text-red-400 text-sm font-medium">{errorMessage}</p>
+            </div>
+          )}
+
+          {/* Submit Button */}
           <button
             onClick={handleButtonClick}
-            className="flex p-1 m-2 justify-center rounded-sm w-[70%] font-bold text-white text-xl bg-[rgb(229,9,20)]"
+            disabled={isLoading}
+            className="w-full h-12 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white font-bold rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 shadow-lg hover:shadow-xl"
           >
-            {isSiginIn ? "Sign In" : "Sign Up"}
-          </button>
-          <p className="text-gray-400 m-8">
-            {isSiginIn ? (
-              <>
-                New to Netflix?{" "}
-                <span
-                  className="text-white font-bold cursor-pointer"
-                  onClick={handleSignIn}
-                >
-                  Sign up now.
-                </span>
-              </>
+            {isLoading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Loading...</span>
+              </div>
             ) : (
-              <>
-                Already have an account?{" "}
-                <span
-                  className="text-white font-bold cursor-pointer"
-                  onClick={handleSignIn}
-                >
-                  Sign in here.
-                </span>
-              </>
+              isSiginIn ? "Sign In" : "Sign Up"
             )}
-          </p>
-        </form>
+          </button>
+
+          {/* Toggle Sign In/Up */}
+          <div className="text-center pt-4">
+            <p className="text-gray-400 text-sm">
+              {isSiginIn ? (
+                <>
+                  New to Netflix?{" "}
+                  <button
+                    type="button"
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition-colors duration-200 underline decoration-transparent hover:decoration-cyan-300"
+                    onClick={handleSignIn}
+                  >
+                    Sign up now
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    className="text-cyan-400 hover:text-cyan-300 font-semibold cursor-pointer transition-colors duration-200 underline decoration-transparent hover:decoration-cyan-300"
+                    onClick={handleSignIn}
+                  >
+                    Sign in here
+                  </button>
+                </>
+              )}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
