@@ -1,22 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { Star, Calendar, Clock, Users, Award, X } from "lucide-react";
+import { Star, Calendar, Clock, Users, Award, X, Bookmark, BookmarkCheck } from "lucide-react";
 import { options } from "../constants/options";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { addToWatchlist, removeFromWatchlist } from "../utils/WatchlistSlice";
 
 const MovieDetailCard = ({ onClose }) => {
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const dispatch = useDispatch();
   const movieId = useSelector((store) => store.Cart.tappedMovieId);
+  const watchlist = useSelector((store) => store.watchlist.movies);
+  const isInWatchlist = watchlist.some((m) => m.id === movieId);
 
   useEffect(() => {
     const fetchData = async () => {
       if (!movieId) return;
-      
+
       setLoading(true);
       setError(null);
-      
+
       try {
         const response = await fetch(
           `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
@@ -27,7 +31,8 @@ const MovieDetailCard = ({ onClose }) => {
           options
         );
         const responseVid = await fetch(
-          `https://api.themoviedb.org/3/movie/${movieId}/videos`,options
+          `https://api.themoviedb.org/3/movie/${movieId}/videos`,
+          options
         );
 
         if (!response.ok) {
@@ -36,24 +41,32 @@ const MovieDetailCard = ({ onClose }) => {
 
         const json = await response.json();
         const jsonCreds = await responseCreds.json();
-        const jsonVid = await responseVid.json()
+        const jsonVid = await responseVid.json();
         console.log("JSONVID", jsonVid.results);
+
         const mappedMovie = {
-          trailerKey:jsonVid.results[0].key,
+          id: json.id,
+          trailerKey: jsonVid.results[0]?.key,
           title: json.title,
-          poster: json.poster_path 
+          poster: json.poster_path
             ? `https://image.tmdb.org/t/p/w500${json.poster_path}`
             : "https://via.placeholder.com/500x750/1f2937/ffffff?text=No+Image",
+          poster_path: json.poster_path,
           rating: json.vote_average?.toFixed(1) || "N/A",
-          year: json.release_date ? new Date(json.release_date).getFullYear() : "N/A",
+          vote_average: json.vote_average,
+          year: json.release_date
+            ? new Date(json.release_date).getFullYear()
+            : "N/A",
           duration: json.runtime ? `${json.runtime} min` : "N/A",
           genre: json.genres?.map((g) => g.name) || [],
-          director: "Loading...", // needs extra API call
-          cast: jsonCreds.cast, // needs extra API call
+          director: jsonCreds.crew?.find((c) => c.job === "Director")?.name || "N/A",
+          cast: jsonCreds.cast || [],
           plot: json.overview || "No plot available.",
-          awards: "N/A", // not available in this API
+          awards: "N/A",
           budget: json.budget ? `$${(json.budget / 1_000_000).toFixed(1)}M` : "N/A",
-          boxOffice: json.revenue ? `$${(json.revenue / 1_000_000).toFixed(1)}M` : "N/A",
+          boxOffice: json.revenue
+            ? `$${(json.revenue / 1_000_000).toFixed(1)}M`
+            : "N/A",
         };
 
         setMovie(mappedMovie);
@@ -67,6 +80,23 @@ const MovieDetailCard = ({ onClose }) => {
 
     fetchData();
   }, [movieId]);
+
+  const handleWatchlistToggle = () => {
+    if (!movie) return;
+
+    if (isInWatchlist) {
+      dispatch(removeFromWatchlist(movie.id));
+    } else {
+      dispatch(
+        addToWatchlist({
+          id: movie.id,
+          title: movie.title,
+          poster_path: movie.poster_path,
+          vote_average: movie.vote_average,
+        })
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -90,7 +120,7 @@ const MovieDetailCard = ({ onClose }) => {
             <h2 className="text-white text-xl font-bold mb-2">Error</h2>
             <p className="text-gray-300 mb-6">{error}</p>
             {onClose && (
-              <button 
+              <button
                 onClick={onClose}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
               >
@@ -110,10 +140,8 @@ const MovieDetailCard = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-hidden border backdrop-blur-sm">
       <div className="max-w-2xl mx-auto bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl overflow-hidden shadow-2xl">
-        
-        {/* Close Button - Optional */}
         {onClose && (
-          <button 
+          <button
             onClick={onClose}
             className="absolute top-4 left-4 z-50 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-300"
           >
@@ -124,15 +152,15 @@ const MovieDetailCard = ({ onClose }) => {
         {/* Movie Poster Section */}
         <div className="relative h-64 sm:h-80 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-         
+
           <iframe
             className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
-          src={`https://www.youtube.com/embed/${movie.trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${movie.trailerKey}&rel=0&modestbranding=1&vq=hd1080`}
-          title="YouTube trailer"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-          referrerPolicy="strict-origin-when-cross-origin"
-        ></iframe>
+            src={`https://www.youtube.com/embed/${movie.trailerKey}?autoplay=1&mute=1&controls=0&loop=1&playlist=${movie.trailerKey}&rel=0&modestbranding=1&vq=hd1080`}
+            title="YouTube trailer"
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+          ></iframe>
 
           {/* Floating Rating Badge */}
           <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 bg-yellow-500/90 backdrop-blur-sm rounded-full px-2 py-1 sm:px-3 sm:py-1 flex items-center gap-1 sm:gap-2 shadow-lg">
@@ -176,9 +204,7 @@ const MovieDetailCard = ({ onClose }) => {
 
           {/* Plot */}
           <div className="space-y-2">
-            <h2 className="text-lg sm:text-xl font-bold text-white">
-              Synopsis
-            </h2>
+            <h2 className="text-lg sm:text-xl font-bold text-white">Synopsis</h2>
             <p className="text-gray-300 leading-relaxed text-sm sm:text-base">
               {movie.plot}
             </p>
@@ -240,8 +266,25 @@ const MovieDetailCard = ({ onClose }) => {
             <button className="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-sm sm:text-base">
               Watch Now
             </button>
-            <button className="flex-1 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-sm sm:text-base">
-              Add to Watchlist
+            <button
+              onClick={handleWatchlistToggle}
+              className={`flex-1 font-bold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-sm sm:text-base flex items-center justify-center gap-2 ${
+                isInWatchlist
+                  ? "bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white"
+                  : "bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white"
+              }`}
+            >
+              {isInWatchlist ? (
+                <>
+                  <BookmarkCheck className="w-5 h-5" />
+                  Remove from Watchlist
+                </>
+              ) : (
+                <>
+                  <Bookmark className="w-5 h-5" />
+                  Add to Watchlist
+                </>
+              )}
             </button>
           </div>
         </div>

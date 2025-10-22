@@ -14,14 +14,14 @@ const Browse = () => {
   usePopularMovies();
   useTopRatedMovies();
   useUpcomingMovies();
-  const showGPTSearch = useSelector(store => store?.GPT?.isActive)
+  
+  const showGPTSearch = useSelector((store) => store?.GPT?.isActive);
+  const searchQuery = useSelector((store) => store?.GPT?.searchQuery);
 
   return (
-    <div className="w-full h-full ">
-
+    <div className="w-full h-full">
       <BrowseHeader />
-      {showGPTSearch ? <GPTSearch/> : <Landing />}
-      
+      {showGPTSearch && searchQuery ? <GPTSearch /> : <Landing />}
     </div>
   );
 };
